@@ -1,46 +1,27 @@
 
-    <title>Crawling</title>
+    <title>Landmark Recognition</title>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="page-header" style="text-align: center;">
-                <h1>Trend Analysis <small>with Django</small></h1>
+                <h1>랜드마크 이미지 인식</h1>
                 <DIV class='content_body'>
-                    <button id='btn_cycle_start' class='btn btn-default'>Crawling Start</button>
-                    <button id='btn_cycle_stop' class='btn btn-default'>Crawling Stop</button>
-                    <button id='btn_cycle_refresh' class='btn btn-default'>Check Files</button>
-                    <button id='btn_cycle_delete_all' class='btn btn-danger'>Delete All</button>
-                    <button id='btn_trend' class='btn btn-primary'>WordCloud Analysis</button>
-                    <button id='btn_trend_result' class='btn btn-info'>Analysis Result</button>
+                    <form method="post" action="{% url 'imageupload' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form fileuploadForm %}
+                        <input type="submit" class="btn btn-primary col-12" value="이미지 업로드">
+                        </form>
                 </DIV> <!-- content_body END -->
 
                 <DIV id='panel' style='display: none; margin: 10px auto; text-align: center; width: 60%;'></DIV>
             </div>
         </div>
-        <div class="content">
-            <div class="toDoDiv">
-                <ul class="list-group">
-                    {% for news in result_set %} <!-- content = {'todos': todos} # key, value -->
-                    <form action="./delete" method="POST">{% csrf_token %}
-                        <div class="input-group">
-                            <li class="list-group-item">
-                                <A href="{{ news.link }}">{{ news.article }}</A>
-                            </li>
-                            <input type="hidden" id="newsno" name="newsno" value="{{ news.newsno }}"></input>
 
-                            <span class="input-group-addon">
-                                <button type="submit" class="custom-btn btn btn-warning">Delete</button>
-                            </span>
-                        </div>
-                    </form>
-                    {% endfor %}
-                </ul>
-            </div>
 
         </div>
         <div class="panel-footer">
-            Crawling by Django.
+            Landmark Recognition Project. Made By JinWoo Kim
         </div>
     </div>
 </body>
