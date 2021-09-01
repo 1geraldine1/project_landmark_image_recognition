@@ -1,28 +1,88 @@
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
 
-    <title>Landmark Recognition</title>
+    <script type="text/JavaScript"
+            src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <style>
+        .content{
+            height: 75%;
+        }
+        .messageDiv{
+            margin-top: 20px;
+            margin-bottom: 50px;
+        }
+        .toDoDiv{
+
+        }
+        .custom-btn{
+            font-size: 10px;
+        }
+        .panel-footer{
+            height:10%;
+            color:gray;
+        }
+    </style>
+
+    <script type="text/javascript">
+      $(function() {
+        $('#btn_image_upload').on('click', image_upload);  // 이벤트 처리 함수 등록
+      });
+
+
+      function image_upload() {
+        // console.log('-> image_upload');
+        $('#panel').html("<button> 업로드된 이미지 분석</button>"); // static
+        $('#panel').css("display", "");
+      }
+
+    function previewON(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#preview_img').attr('src', e.target.result);
+                    $('#preview_img').attr('style', 'width:50%;');
+                    $('#img_submit').attr('style', '');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+</script>
+
+    <title>랜드마크 위치 서비스</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="page-header" style="text-align: center;">
-                <h1>랜드마크 이미지 인식</h1>
-                <DIV class='content_body'>
-                    <form method="post" action="{% url 'imageupload' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form fileuploadForm %}
-                        <input type="submit" class="btn btn-primary col-12" value="이미지 업로드">
-                        </form>
-                </DIV> <!-- content_body END -->
+<div class="container">
+    <div class="header">
+        <div class="page-header" style="text-align: center;">
+            <h1>랜드마크 이미지 인식</h1>
+            <DIV class='content_body'>
+                <form method="POST" action="{% url 'imageupload' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <img id="preview_img" src="#" style="display: none;"><br>
+                    <div style="display:inline-flex">
+                        <input type="file" onchange ="previewON(this)" name="file" id="imageSelect" accept="image/png, image/jpeg, image/jpg">
+                    </div>
+                    <br><br>
+                    <input type="submit" class="btn btn-primary col-12" value="분석 시작" id="img_submit" style="display:none">
+                </form>
+            </DIV> <!-- content_body END -->
 
-                <DIV id='panel' style='display: none; margin: 10px auto; text-align: center; width: 60%;'></DIV>
-            </div>
-        </div>
-
-
-        </div>
-        <div class="panel-footer">
-            Landmark Recognition Project. Made By JinWoo Kim
+            <DIV id='panel' style='display: none; margin: 10px auto; text-align: center; width: 60%;'></DIV>
         </div>
     </div>
+
+    <div class="panel-footer">
+        Made by JinWoo Kim<br>
+        1geraldine1.github.io
+    </div>
+</div>
+
 </body>
+
 </html>
