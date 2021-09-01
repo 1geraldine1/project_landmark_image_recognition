@@ -62,7 +62,7 @@
         <div class="page-header" style="text-align: center;">
             <h1>랜드마크 이미지 인식</h1>
             <DIV class='content_body'>
-                <form method="POST" action="{% url 'imageupload' %}" enctype="multipart/form-data">
+                <form method="POST" action="{% url 'result' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <img id="preview_img" src="#" style="display: none;"><br>
                     <div style="display:inline-flex">
@@ -72,6 +72,9 @@
                     <input type="submit" class="btn btn-primary col-12" value="분석 시작" id="img_submit" style="display:none">
                 </form>
             </DIV> <!-- content_body END -->
+
+            {% block content %}
+            {% endblock content %}
 
             <DIV id='panel' style='display: none; margin: 10px auto; text-align: center; width: 60%;'></DIV>
         </div>

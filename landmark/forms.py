@@ -5,3 +5,4 @@ class ImageModelForm(ModelForm):
     class Meta:
         model = imageModel
         fields = ['imgfile']
+

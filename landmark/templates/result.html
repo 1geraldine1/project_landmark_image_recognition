@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% block content %}
+
+
+<div>
+    <h1> 해당 랜드마크는 <strong>{{result.pred_landmark_name}}</strong> 입니다.</h1><br>
+    <h2> 예상 적중률은 <strong>{{result.pred_accuracy}}</strong> 입니다.</h2><br>
+    <h2> 해당 랜드마크는 <strong>{{result.location}}</strong> 에 있습니다</h2><br>
+    <h2> 해당 랜드마크의 위치 좌표는 <strong>{{result.near_tour_latlng}}</strong> 입니다.</h2>
+</div>
+
+
+{% endblock %}
