@@ -31,13 +31,21 @@ def analysis(img,request):
     #이미지 분석 결과 출력
     pred_landmark_name = 'Landmark_name'
     pred_accuracy = "~~ %"
-    location = '도로명 주소'
-    near_tour_latlng = '위도 경도값'
+    location = '서울특별시 종로구 세종로 세종대로 172'
+    lat = '37.57111'
+    lng = '126.97696'
     result = {'pred_landmark_name': pred_landmark_name,
               'pred_accuracy': pred_accuracy,
               'location': location,
-              'near_tour_latlng': near_tour_latlng}
-
+              'lat': lat,
+              'lng': lng}
 
 
     return render(request,'result.html', {'result':result})
+
+
+def recommand(request):
+
+    recommand_data = {}
+
+    return render(request,'recommand.html',{'result':result})
