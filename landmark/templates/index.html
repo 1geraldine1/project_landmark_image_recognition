@@ -31,16 +31,6 @@
     </style>
 
     <script type="text/javascript">
-      $(function() {
-        $('#btn_image_upload').on('click', image_upload);  // 이벤트 처리 함수 등록
-      });
-
-
-      function image_upload() {
-        // console.log('-> image_upload');
-        $('#panel').html("<button> 업로드된 이미지 분석</button>"); // static
-        $('#panel').css("display", "");
-      }
 
     function previewON(input) {
             if (input.files && input.files[0]) {
@@ -78,7 +68,6 @@
             {% block content %}
             {% endblock content %}
 
-            <DIV id='panel' style='display: none; margin: 10px auto; text-align: center; width: 60%;'></DIV>
         </div>
     </div>
 
