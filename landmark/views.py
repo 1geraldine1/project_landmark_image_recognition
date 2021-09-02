@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from landmark.models import imageModel
@@ -38,7 +39,8 @@ def analysis(img,request):
               'pred_accuracy': pred_accuracy,
               'location': location,
               'lat': lat,
-              'lng': lng}
+              'lng': lng,
+              'api_key': settings.GOOGLE_MAPS_API_KEY}
 
 
     return render(request,'result.html', {'result':result})
