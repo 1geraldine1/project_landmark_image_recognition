@@ -5,15 +5,58 @@
 
 {{result | json_script:"jsonData"}}
 
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?key={{result.api_key}}" ></script>
+<style>
+.map {width:100%; height:300px; clear:both; border:solid 1px red; display:hidden;}
+.map_cover {display:none;}
+article div{overflow:visible}
+</style>
 <script type="text/javascript">
     $('#imageSelect').attr('style', 'display:none;');
-    var data = JSON.parse(document.getElementById("jsonData").textContent)
 
-    function mapON(lat,lng) {
-        console.log(lat,lng)
+    var data = JSON.parse(document.getElementById("jsonData").textContent)
+    var maps = [];
+    var markers = [];
+
+    $(document).ready(function() {
+
+        var $maps = $('.map');
+
+        $.each($maps, function (i, value) {
+            console.log("lat: "+$(value).attr('lat'));
+            var latlng = { lat: parseFloat($(value).attr('lat')), lng: parseFloat($(value).attr('lng')) };
+            console.log(latlng)
+            var mapDivId = $(value).attr('id');
+
+            maps[mapDivId] = new google.maps.Map(document.getElementById(mapDivId), {
+                zoom: 15,
+                center: latlng
+            });
+
+            markers[mapDivId] = new google.maps.Marker({
+                position: latlng,
+                map: maps[mapDivId]
+            });
+        })
+    })
+
+    function mapON(site) {
+
+        $('#map_cover_'+site).attr('style', 'display:inline');
+        $('#btn_'+site).attr('style','display:none')
+        $('#btn2_'+site).attr('style','display:inline-block')
+    }
+
+    function mapOFF(site) {
+        $('#map_cover_'+site).attr('style', 'display:none;');
+        $('#btn_'+site).attr('style','display:inline-block')
+        $('#btn2_'+site).attr('style','display:none')
     }
 
 </script>
+
+
 
 <div class="content">
     <div class="toDoDiv">
@@ -30,8 +73,9 @@
                     document.write("<td style=\"width:20%;\">이름 : " + name + "</td>")
                     document.write("<td style=\"width:10%\">분류 : " + category + "</td>")
                     document.write("<td style=\"width:20%\">위치 : " + lat + "," + lng + "</td>")
-                    document.write("<td style=\"width:20%;\"><button onclick=\"mapON(\'" + lat + "\',\'" + lng + "\')\">위치 보기</button></td>")
+                    document.write("<td style=\"width:20%;\"><button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button><button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button></td>")
                     document.write("</tr></table>")
+                    document.write("<div class=\"map_cover\" id=\"map_cover_" + site +"\"><div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\"></div></div>")
                     document.write("</li>")
                 }
             </script>

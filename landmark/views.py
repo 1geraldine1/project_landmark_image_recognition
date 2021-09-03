@@ -64,24 +64,25 @@ def recommand(request):
     recommand_list = {}
     recommand_001 = {"name":'001',
                      "category":'cate01',
-                     "lat":'lat01',
-                     "lng":'lng01'}
+                     "lat": '37.57111',
+                     "lng": '126.97696'}
     recommand_002 = {"name": '002',
                      "category": 'cate02',
-                     "lat": 'lat02',
-                     "lng": 'lng02'}
+                     "lat": '37.57235',
+                     "lng": '126.97687'}
     recommand_003 = {"name": '003',
                      "category": 'cate01',
-                     "lat": 'lat03',
-                     "lng": 'lng03'}
+                     "lat": '37.58091',
+                     "lng": '126.97631'}
 
-    recommand_list['recommand_001'] = recommand_001
-    recommand_list['recommand_002'] = recommand_002
-    recommand_list['recommand_003'] = recommand_003
+    recommand_list[1] = recommand_001
+    recommand_list[2] = recommand_002
+    recommand_list[3] = recommand_003
 
     result = {
         'recommand': recommand_site_txt,
-        'recommand_list': recommand_list
+        'recommand_list': recommand_list,
+        'api_key': settings.GOOGLE_MAPS_API_KEY
     }
     print(result)
 
