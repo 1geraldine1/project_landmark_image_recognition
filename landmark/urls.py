@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
 	path('',index,name="index"),
-	path('result',result,name="result")
+	path('result',result,name="result"),
+	path('recommand',recommand,name="recommand")
 
 ]

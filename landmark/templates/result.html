@@ -9,8 +9,10 @@
     $('#imageSelect').attr('style', 'display:none;');
 
     function recommand(recommand_site){
-        console.log(recommand_site)
+        console.log('/recommand?recommand_site=' + recommand_site)
+        location.href = '/recommand?recommand_site=' + recommand_site
     }
+
 </script>
 
 <div>
@@ -89,6 +91,9 @@
             </td>
         </tr>
     </table>
+
+    <div id ='panel' style="display:none">
+    </div>
 </div>
 
 
