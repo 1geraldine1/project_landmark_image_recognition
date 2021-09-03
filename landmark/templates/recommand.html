@@ -5,7 +5,6 @@
 
 {{result | json_script:"jsonData"}}
 
-
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?key={{result.api_key}}" ></script>
 <style>
 .map {width:100%; height:300px; clear:both; border:solid 1px red; display:hidden;}
@@ -16,6 +15,7 @@ article div{overflow:visible}
     $('#imageSelect').attr('style', 'display:none;');
 
     var data = JSON.parse(document.getElementById("jsonData").textContent)
+
     var maps = [];
     var markers = [];
 
@@ -28,15 +28,32 @@ article div{overflow:visible}
             var latlng = { lat: parseFloat($(value).attr('lat')), lng: parseFloat($(value).attr('lng')) };
             console.log(latlng)
             var mapDivId = $(value).attr('id');
+            var zoomLevel = 16;
+            var markerTitle = $(value).attr('title');
+            var markerMaxWidth = 300;
+            var contentString = '<div>' + '지오코딩 예정' + '</div>';
 
-            maps[mapDivId] = new google.maps.Map(document.getElementById(mapDivId), {
-                zoom: 15,
-                center: latlng
-            });
+            var mapOptions = {
+                        zoom: zoomLevel,
+                        center: latlng,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                     }
+
+            maps[mapDivId] = new google.maps.Map(document.getElementById(mapDivId), mapOptions);
 
             markers[mapDivId] = new google.maps.Marker({
                 position: latlng,
                 map: maps[mapDivId]
+            });
+
+            var infowindow = new google.maps.InfoWindow(
+                                                {
+                                                    content: contentString,
+                                                    maxWidth: markerMaxWidth
+                                                }
+                                                );
+            google.maps.event.addListener(markers[mapDivId], 'click', function() {
+                infowindow.open(maps[mapDivId], markers[mapDivId]);
             });
         })
     })
@@ -60,7 +77,7 @@ article div{overflow:visible}
 
 <div class="content">
     <div class="toDoDiv">
-        <ul class="list-group" id="listGroup">
+        <ul class="list-group">
             <script type="text/javascript">
                 for (site in data['recommand_list'])
                 {
@@ -73,9 +90,14 @@ article div{overflow:visible}
                     document.write("<td style=\"width:20%;\">이름 : " + name + "</td>")
                     document.write("<td style=\"width:10%\">분류 : " + category + "</td>")
                     document.write("<td style=\"width:20%\">위치 : " + lat + "," + lng + "</td>")
-                    document.write("<td style=\"width:20%;\"><button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button><button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button></td>")
+                    document.write("<td style=\"width:20%;\">")
+                    document.write("<button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button>")
+                    document.write("<button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button>")
+                    document.write("</td>")
                     document.write("</tr></table>")
-                    document.write("<div class=\"map_cover\" id=\"map_cover_" + site +"\"><div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\"></div></div>")
+                    document.write("<div class=\"map_cover\" id=\"map_cover_" + site +"\">")
+                    document.write("<div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\" title=\"" + name + "\"></div>")
+                    document.write("</div>")
                     document.write("</li>")
                 }
             </script>
