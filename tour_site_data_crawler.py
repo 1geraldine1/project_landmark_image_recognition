@@ -153,6 +153,7 @@ def history_site_processing():
     out_df['주소'] = address
     out_df['이름'] = new_name
     out_df['설명'] = explain
+    
 
     processed_filename = "seoul_history_processed.csv"
     processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
