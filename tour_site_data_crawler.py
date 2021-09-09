@@ -11,6 +11,7 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 import urllib.request
+import Tools
 
 BASE_DIR = Path(__file__).resolve().parent
 tour_site_data_dir = "./crawling_target/tour_site_data/"
@@ -29,7 +30,7 @@ def culture_site_processing():
     address = []
     new_name = []
 
-    for city, district, dong, site_name in df[['행정 시', '행정 구', '행정 동', '명칭']].iloc:
+    for city, district, dong, site_name in tqdm(df[['행정 시', '행정 구', '행정 동', '명칭']].iloc):
         print("keyword : ", city, district, dong, site_name)
         elem = driver.find_element_by_name("q")
         elem.clear()
@@ -89,16 +90,16 @@ def history_site_processing():
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://www.google.co.kr")
 
-    culture_site_data_filename = "서울시 유적지 현황 (한국어).csv"
-    culture_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, culture_site_data_filename)
+    history_site_data_filename = "서울시 유적지 현황 (한국어).csv"
+    history_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, history_site_data_filename)
 
-    df = pd.read_csv(culture_site_data_fullpath, encoding="CP949")
+    df = pd.read_csv(history_site_data_fullpath, encoding="CP949")
     out_df = pd.DataFrame(df['명칭'], columns=['이름'])
     address = []
     new_name = []
     explain = []
 
-    for city, district, dong, site_name in df[['행정 시', '행정 구', '행정 동', '명칭']].iloc:
+    for city, district, dong, site_name in tqdm(df[['행정 시', '행정 구', '행정 동', '명칭']].iloc):
         print("keyword : ", city, district, dong, site_name)
         elem = driver.find_element_by_name("q")
         elem.clear()
@@ -153,7 +154,6 @@ def history_site_processing():
     out_df['주소'] = address
     out_df['이름'] = new_name
     out_df['설명'] = explain
-    
 
     processed_filename = "seoul_history_processed.csv"
     processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
@@ -163,4 +163,141 @@ def history_site_processing():
     driver.quit()
 
 
-history_site_processing()
+def traditional_market_site_processing():
+    traditional_market_site_data_filename = "서울시 전통시장 현황.csv"
+    traditional_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, traditional_market_site_data_filename)
+
+    df = pd.read_csv(traditional_site_data_fullpath, encoding="CP949")
+    out_df = pd.DataFrame()
+
+    out_df['주소'] = df['주소명']
+    out_df['이름'] = df['전통시장명']
+    out_df['위도'] = df['위도']
+    out_df['경도'] = df['경도']
+
+    processed_filename = "seoul_traditional_market_processed.csv"
+    processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
+    out_df.to_csv(processed_data_fullpath, mode='w', encoding='UTF-8')
+
+    print(out_df)
+
+
+def hotel_site_processing():
+    tour_hotel_site_data_filename = "서울특별시 숙박업 인허가 정보.csv"
+    tour_hotel_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, tour_hotel_site_data_filename)
+
+    df = pd.read_csv(tour_hotel_site_data_fullpath, encoding="CP949")
+    out_df = pd.DataFrame()
+
+    address = []
+    site_name = []
+    lat_arr = []
+    lng_arr = []
+
+    for line in tqdm(df.iloc):
+        if line['영업상태코드'] == 1:
+            address.append(line['도로명주소'])
+            site_name.append(line['사업장명'])
+            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+
+            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
+            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+
+            lat_arr.append(lat)
+            lng_arr.append(lng)
+
+    out_df['주소'] = address
+    out_df['이름'] = site_name
+    out_df['위도'] = lat_arr
+    out_df['경도'] = lng_arr
+
+    processed_filename = "seoul_hotel_processed.csv"
+    processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
+    out_df.to_csv(processed_data_fullpath, mode='w', encoding='UTF-8')
+
+    print(out_df)
+
+
+def department_processing():
+    department_site_data_filename = "서울특별시 대규모점포 인허가 정보.csv"
+    department_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, department_site_data_filename)
+
+    df = pd.read_csv(department_site_data_fullpath, encoding="CP949")
+    out_df = pd.DataFrame()
+
+    address = []
+    site_name = []
+    lat_arr = []
+    lng_arr = []
+
+    for line in tqdm(df.iloc):
+        if line['영업상태코드'] == 1:
+            if line['도로명주소'] is not np.nan:
+                address.append(line['도로명주소'])
+            else:
+                address.append(line['지번주소'])
+            site_name.append(line['사업장명'])
+            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+
+            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
+            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+
+            lat_arr.append(lat)
+            lng_arr.append(lng)
+
+    out_df['주소'] = address
+    out_df['이름'] = site_name
+    out_df['위도'] = lat_arr
+    out_df['경도'] = lng_arr
+
+    processed_filename = "seoul_department_processed.csv"
+    processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
+    out_df.to_csv(processed_data_fullpath, mode='w', encoding='UTF-8')
+
+    print(out_df)
+
+
+def restaurant_processing():
+    restaurant_site_data_filename = "서울특별시 일반음식점 인허가 정보.csv"
+    restaurant_site_data_fullpath = Path(BASE_DIR, tour_site_data_dir, restaurant_site_data_filename)
+
+    df = pd.read_csv(restaurant_site_data_fullpath, encoding="CP949")
+    out_df = pd.DataFrame()
+
+    address = []
+    site_name = []
+    lat_arr = []
+    lng_arr = []
+    category = []
+
+    for line in tqdm(df.iloc):
+        if line['영업상태코드'] == 1:
+            if line['도로명주소'] is not np.nan:
+                address.append(line['도로명주소'])
+            else:
+                address.append(line['지번주소'])
+            site_name.append(line['사업장명'])
+            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+
+            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
+            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+
+            lat_arr.append(lat)
+            lng_arr.append(lng)
+
+            category.append(line['업태구분명'])
+
+    out_df['카테고리'] = category
+    out_df['주소'] = address
+    out_df['이름'] = site_name
+    out_df['위도'] = lat_arr
+    out_df['경도'] = lng_arr
+
+    processed_filename = "seoul_restaurant_processed.csv"
+    processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
+    out_df.to_csv(processed_data_fullpath, mode='w', encoding='UTF-8')
+
+    print(out_df)
+
+
+restaurant_processing()
