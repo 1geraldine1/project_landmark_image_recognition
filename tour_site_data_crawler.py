@@ -108,16 +108,16 @@ def history_site_processing():
 
         # 검색 결과가 정상적으로 나올때
         try:
-            target = driver.find_element_by_class_name('SPZz6b').find_element_by_tag_name('span')
-            target_new_name = driver.find_element_by_class_name('LrzXr')
+            target_new_name = driver.find_element_by_class_name('SPZz6b').find_element_by_tag_name('span')
+            target_address = driver.find_element_by_class_name('LrzXr')
             target_explain = driver.find_element_by_class_name('kno-rdesc').find_element_by_tag_name('span')
 
-            address.append(target.text)
             new_name.append(target_new_name.text)
+            address.append(target_address.text)
             explain.append(target_explain.text)
 
-            print(target.text)
             print(target_new_name.text)
+            print(target_address.text)
             print(target_explain.text)
 
         # 검색 결과가 두건 이상 나오거나, 검색 결과가 없을때 재검색 실행
@@ -145,8 +145,8 @@ def history_site_processing():
             # 검색결과가 존재하지 않을때
             except Exception:
                 print("검색결과가 없습니다 : ", site_name)
-                address.append('NaN')
                 new_name.append(site_name)
+                address.append('NaN')
                 explain.append('NaN')
         finally:
             time.sleep(1)
@@ -154,6 +154,8 @@ def history_site_processing():
     out_df['주소'] = address
     out_df['이름'] = new_name
     out_df['설명'] = explain
+
+    out_df = out_df.drop_duplicates(subset=['이름'], keep='first', ignore_index=True)
 
     processed_filename = "seoul_history_processed.csv"
     processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
@@ -196,12 +198,17 @@ def hotel_site_processing():
 
     for line in tqdm(df.iloc):
         if line['영업상태코드'] == 1:
-            address.append(line['도로명주소'])
-            site_name.append(line['사업장명'])
-            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+            if line['도로명주소'] is not np.nan:
+                addr = line['도로명주소']
+            elif line['지번주소'] is not np.nan:
+                addr = line['지번주소']
+            else:
+                addr = ''
+            address.append(addr)
 
-            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
-            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+            site_name.append(line['사업장명'])
+
+            lat, lng = Tools.geocoding_naver(addr)
 
             lat_arr.append(lat)
             lng_arr.append(lng)
@@ -233,14 +240,16 @@ def department_processing():
     for line in tqdm(df.iloc):
         if line['영업상태코드'] == 1:
             if line['도로명주소'] is not np.nan:
-                address.append(line['도로명주소'])
+                addr = line['도로명주소']
+            elif line['지번주소'] is not np.nan:
+                addr = line['지번주소']
             else:
-                address.append(line['지번주소'])
-            site_name.append(line['사업장명'])
-            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+                addr = ''
+            address.append(addr)
 
-            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
-            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+            site_name.append(line['사업장명'])
+
+            lat, lng = Tools.geocoding_naver(addr)
 
             lat_arr.append(lat)
             lng_arr.append(lng)
@@ -249,6 +258,10 @@ def department_processing():
     out_df['이름'] = site_name
     out_df['위도'] = lat_arr
     out_df['경도'] = lng_arr
+
+    out_df = out_df.replace([np.inf], np.nan)
+    out_df = out_df.drop_duplicates(subset=['이름'], keep='first', ignore_index=True)
+    out_df = out_df.dropna(axis=0, subset=['주소', '위도', '경도'])
 
     processed_filename = "seoul_department_processed.csv"
     processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
@@ -273,19 +286,24 @@ def restaurant_processing():
     for line in tqdm(df.iloc):
         if line['영업상태코드'] == 1:
             if line['도로명주소'] is not np.nan:
-                address.append(line['도로명주소'])
+                addr = line['도로명주소']
+            elif line['지번주소'] is not np.nan:
+                addr = line['지번주소']
             else:
-                address.append(line['지번주소'])
-            site_name.append(line['사업장명'])
-            x, y = line['좌표정보(X)'], line['좌표정보(Y)']
+                addr = ''
+            address.append(addr)
 
-            # 중부원점 좌표계(epsg:2097) -> 경도 위도 좌표계(epsg:4326)로 변환
-            lng, lat = Tools.coordinate_change(x, y, 'epsg:2097', 'epsg:4326')
+            site_name.append(line['사업장명'])
+
+            lat, lng = Tools.geocoding_naver(addr)
 
             lat_arr.append(lat)
             lng_arr.append(lng)
 
-            category.append(line['업태구분명'])
+            if line['업태구분명'] is not np.nan:
+                category.append(line['업태구분명'])
+            else:
+                category.append('기타 음식점')
 
     out_df['카테고리'] = category
     out_df['주소'] = address
@@ -293,7 +311,7 @@ def restaurant_processing():
     out_df['위도'] = lat_arr
     out_df['경도'] = lng_arr
 
-    processed_filename = "seoul_restaurant_processed.csv"
+    processed_filename = "seoul_restaurant_processed2.csv"
     processed_data_fullpath = Path(BASE_DIR, processed_data_dir, processed_filename)
     out_df.to_csv(processed_data_fullpath, mode='w', encoding='UTF-8')
 
