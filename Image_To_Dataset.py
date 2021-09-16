@@ -15,100 +15,8 @@ json_dir = os.path.join(BASE_DIR, "landmark_json")
 categories = os.listdir(data_dir)
 num_classes = len(categories)
 
-def make_ds():
-    batch_size = 32
-    img_height = 180
-    img_width = 180
 
-    train_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        subset="training",
-        seed=123,
-        image_size=(img_height, img_width),
-        batch_size=batch_size)
-
-    val_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        subset="validation",
-        seed=123,
-        image_size=(img_height, img_width),
-        batch_size=batch_size)
-
-    class_names = train_ds.class_names
-    print(class_names)
-
-    for image_batch, labels_batch in train_ds:
-        print(image_batch.shape)
-        print(labels_batch.shape)
-        break
-
-    AUTOTUNE = tf.data.experimental.AUTOTUNE
-
-    train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
-    val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
-    normalization_layer = layers.experimental.preprocessing.Rescaling(1. / 255)
-
-    normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
-    image_batch, labels_batch = next(iter(normalized_ds))
-    first_image = image_batch[0]
-    # Notice the pixels values are now in `[0,1]`.
-    print(np.min(first_image), np.max(first_image))
-
-    num_classes = 4
-
-
-    model = Sequential([
-        layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=(img_height, img_width, 3)),
-        layers.Conv2D(16, 3, padding='same', activation='relu'),
-        layers.MaxPooling2D(),
-        layers.Conv2D(32, 3, padding='same', activation='relu'),
-        layers.MaxPooling2D(),
-        layers.Conv2D(64, 3, padding='same', activation='relu'),
-        layers.MaxPooling2D(),
-        layers.Flatten(),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(num_classes)
-    ])
-
-    model.compile(optimizer='adam',
-                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=['accuracy'])
-
-    model.summary()
-
-    epochs = 10
-    history = model.fit(
-        train_ds,
-        validation_data=val_ds,
-        epochs=epochs
-    )
-
-    acc = history.history['accuracy']
-    val_acc = history.history['val_accuracy']
-
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-
-    epochs_range = range(epochs)
-
-    plt.figure(figsize=(8, 8))
-    plt.subplot(1, 2, 1)
-    plt.plot(epochs_range, acc, label='Training Accuracy')
-    plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-    plt.legend(loc='lower right')
-    plt.title('Training and Validation Accuracy')
-
-    plt.subplot(1, 2, 2)
-    plt.plot(epochs_range, loss, label='Training Loss')
-    plt.plot(epochs_range, val_loss, label='Validation Loss')
-    plt.legend(loc='upper right')
-    plt.title('Training and Validation Loss')
-    plt.show()
-
-def create_dataset_noncrop():
+def create_dataset_noncrop_np():
     image_size = 128
 
     X = []
@@ -138,7 +46,7 @@ def create_dataset_noncrop():
     np.savez("./img_data_noncrop.npz", xy)
 
 
-def create_dataset_crop():
+def create_dataset_crop_np():
     image_size = 128
 
     X = []
@@ -174,12 +82,89 @@ def create_dataset_crop():
     X = np.array(X)
     Y = np.array(Y)
 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y)
-    xy = (X_train, X_test, Y_train, Y_test)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=1)
 
-    np.save('./img_data_crop.npy',xy)
+    np.savez('./img_data_crop_4.npz', X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test)
+    # np.savez('./img_data_crop.npz',xy=xy)
 
+
+def image_data_generator_test():
+    img_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255, rotation_range=20, validation_split=0.2)
+    feature_shape = (None,256,256,3)
+    label_shape = (None,)
+
+    train_ds = tf.data.Dataset.from_generator(
+        lambda: img_gen.flow_from_directory(
+            data_dir, classes=categories,
+            class_mode='sparse', subset='training', seed=123
+        ),
+        output_signature=(
+            tf.TensorSpec(shape=tf.TensorShape(feature_shape),dtype=tf.float32),
+            tf.TensorSpec(shape=tf.TensorShape(label_shape),dtype=tf.float32)
+        )
+    )
+    test_ds = tf.data.Dataset.from_generator(
+        lambda: img_gen.flow_from_directory(
+            data_dir, classes=categories,
+            class_mode='sparse', subset='validation', seed=123
+        ),
+        output_signature=(
+            tf.TensorSpec(shape=tf.TensorShape(feature_shape), dtype=tf.float32),
+            tf.TensorSpec(shape=tf.TensorShape(label_shape), dtype=tf.float32)
+        )
+    )
+
+    print(train_ds.element_spec)
+
+    num_classes = 4
+
+    model = tf.keras.Sequential([
+        layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=(256, 256, 3)),
+        tf.keras.layers.Conv2D(16, 3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.Conv2D(32, 3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.Conv2D(64, 3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(num_classes)
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy'])
+
+    model.summary()
+
+    model.fit(
+        train_ds,
+        epochs=10,
+        batch_size=512
+    )
+
+    model.evaluate(test_ds, batch_size=512)
+
+
+def load_npz():
+    label_to_index = {}
+    for i in len(categories):
+        label_to_index[categories[i]] = i
+
+    filename = 'img_data_crop.npz'
+    filepath = os.path.join(BASE_DIR, filename)
+    with np.load(filepath) as data:
+        X_train = data['X_train']
+        X_test = data['X_test']
+        Y_train = data['Y_train']
+        Y_test = data['Y_test']
+
+    print(X_train, X_test, Y_train, Y_test)
+
+
+# load_npz()
 # create_dataset_noncrop()
-# create_dataset_crop()
+# create_dataset_crop_np()
 
-make_ds()
+image_data_generator_test()

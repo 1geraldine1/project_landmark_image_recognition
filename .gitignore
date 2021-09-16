@@ -2,7 +2,6 @@ venv/
 landmark/
 landmark_json/
 trained_model/
-./.git/objects/pack/pack-b66e515f40157d43fc71a19534c7a36b40cf676e.pack
 ./img_data_crop.npy
 ./img_data_crop.npz
 ./img_data_crop2.npz
