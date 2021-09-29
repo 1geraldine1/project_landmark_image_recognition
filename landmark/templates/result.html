@@ -10,16 +10,18 @@
 
     function recommand(recommand_site){
         console.log('/recommand?recommand_site=' + recommand_site)
-        location.href = '/recommand?recommand_site=' + recommand_site
+        location.href = '/recommand?recommand_site=' + recommand_site + '&lat=' + {{result.lat}} + '&lng=' + {{result.lng}}
     }
+
+
 
 </script>
 
+
 <div>
-    <h1> 해당 랜드마크는 <strong>{{result.pred_landmark_name}}</strong> 입니다.</h1><br>
-    <h2> 예상 적중률은 <strong>{{result.pred_accuracy}}</strong> 입니다.</h2><br>
-    <h2> 해당 랜드마크는 <strong>{{result.location}}</strong> 에 있습니다</h2><br>
-    <h2> 해당 랜드마크의 위도, 경도는 <strong>{{result.lat}}, {{result.lng}}</strong> 입니다.</h2>
+    <h2> 해당 랜드마크는 <strong>{{result.pred_landmark_name}}</strong> 입니다.</h2><br>
+    <h3> 해당 랜드마크는 <strong>{{result.location}}</strong> 에 있습니다</h3><br>
+    <h3> 해당 랜드마크의 위도, 경도는 <strong>{{result.lat}}, {{result.lng}}</strong> 입니다.</h3>
 </div>
 
 <div id="map_ma"></div>
@@ -32,7 +34,7 @@
     var markerTitle = '{{result.pred_landmark_name}}';
     var markerMaxWidth = 300;
 
-    var contentString = '<div>' + '<h2> {{result.location}} </h2>' + '</div>'
+    var contentString = '<div>' + '{{result.location}}' + '</div>'
     var mapOptions = {
                         zoom: zoomLevel,
                         center: myLatLng,

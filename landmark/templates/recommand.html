@@ -15,6 +15,7 @@ article div{overflow:visible}
     $('#imageSelect').attr('style', 'display:none;');
 
     var data = JSON.parse(document.getElementById("jsonData").textContent)
+    var dist_filter = 0
 
     var maps = [];
     var markers = [];
@@ -71,36 +72,65 @@ article div{overflow:visible}
         $('#btn2_'+site).attr('style','display:none')
     }
 
+
+    function create_list(dfilter) {
+        object = document.getElementById('list-group')
+        txt = "";
+
+        for (site in data['recommand_list']){
+            name = data['recommand_list'][site]['name'];
+            address = data['recommand_list'][site]['address'];
+            lat = data['recommand_list'][site]['lat'];
+            lng = data['recommand_list'][site]['lng'];
+            category = data['recommand_list'][site]['category'];
+            dist = data['recommand_list'][site]['dist'];
+            filter = data['recommand_list'][site]['dist_filter'];
+
+            if (dfilter < filter) {continue}
+
+            txt += "<li class=\"list-group-item\">"
+            txt += "<table style=\"width: 90%; margin:auto;\"><tr>"
+            txt += "<td style=\"width:20%;\">이름 : " + name + "</td>"
+
+            if (category){txt += "<td style=\"width:15%;\">분류 : " + category + "</td>"}
+
+            txt += "<td style=\"width:40%\">주소 : " + address + "</td>"
+            txt += "<td style=\"width:10%;\">"
+            txt += "<button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button>"
+            txt += "<button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button>"
+            txt += "</td>"
+            txt += "</tr></table>"
+            txt += "<div class=\"map_cover\" id=\"map_cover_" + site +"\">"
+            txt += "<div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\" title=\"" + name + "\"></div>"
+            txt += "</div>"
+            txt += "</li>"
+            console.log("txt : " + txt)
+        }
+        console.log("txt : " + txt)
+        object.innerHTML = txt
+
+    }
+
 </script>
 
+<div style="text-align:left">
+    <div class="dropdown">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+        거리별 필터
+      </a>
 
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li><a class="dropdown-item" href="#" onclick="create_list(0)">0.5km</a></li>
+        <li><a class="dropdown-item" href="#" onclick="create_list(1)">1km</a></li>
+        <li><a class="dropdown-item" href="#" onclick="create_list(2)">1.5km</a></li>
+      </ul>
+    </div>
+</div>
 
 <div class="content">
     <div class="toDoDiv">
-        <ul class="list-group">
-            <script type="text/javascript">
-                for (site in data['recommand_list'])
-                {
-                    name = data['recommand_list'][site]['name'];
-                    category = data['recommand_list'][site]['category']
-                    lat = data['recommand_list'][site]['lat']
-                    lng = data['recommand_list'][site]['lng']
-                    document.write("<li class=\"list-group-item\">")
-                    document.write("<table style=\"width: 80%; margin:auto;\"><tr>")
-                    document.write("<td style=\"width:20%;\">이름 : " + name + "</td>")
-                    document.write("<td style=\"width:10%\">분류 : " + category + "</td>")
-                    document.write("<td style=\"width:20%\">위치 : " + lat + "," + lng + "</td>")
-                    document.write("<td style=\"width:20%;\">")
-                    document.write("<button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button>")
-                    document.write("<button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button>")
-                    document.write("</td>")
-                    document.write("</tr></table>")
-                    document.write("<div class=\"map_cover\" id=\"map_cover_" + site +"\">")
-                    document.write("<div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\" title=\"" + name + "\"></div>")
-                    document.write("</div>")
-                    document.write("</li>")
-                }
-            </script>
+        <ul class="list-group" id="list-group">
+
         </ul>
     </div>
 </div>
