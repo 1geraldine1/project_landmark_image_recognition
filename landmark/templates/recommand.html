@@ -74,6 +74,7 @@ article div{overflow:visible}
 
 
     function create_list(dfilter) {
+
         object = document.getElementById('list-group')
         txt = "";
 
@@ -108,6 +109,43 @@ article div{overflow:visible}
         }
         console.log("txt : " + txt)
         object.innerHTML = txt
+
+
+        var $maps = $('.map');
+
+        $.each($maps, function (i, value) {
+            console.log("lat: "+$(value).attr('lat'));
+            var latlng = { lat: parseFloat($(value).attr('lat')), lng: parseFloat($(value).attr('lng')) };
+            console.log(latlng)
+            var mapDivId = $(value).attr('id');
+            var zoomLevel = 16;
+            var markerTitle = $(value).attr('title');
+            var markerMaxWidth = 300;
+            var contentString = '<div>' + '지오코딩 예정' + '</div>';
+
+            var mapOptions = {
+                        zoom: zoomLevel,
+                        center: latlng,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                     }
+
+            maps[mapDivId] = new google.maps.Map(document.getElementById(mapDivId), mapOptions);
+
+            markers[mapDivId] = new google.maps.Marker({
+                position: latlng,
+                map: maps[mapDivId]
+            });
+
+            var infowindow = new google.maps.InfoWindow(
+                                                {
+                                                    content: contentString,
+                                                    maxWidth: markerMaxWidth
+                                                }
+                                                );
+            google.maps.event.addListener(markers[mapDivId], 'click', function() {
+                infowindow.open(maps[mapDivId], markers[mapDivId]);
+            });
+        })
 
     }
 
