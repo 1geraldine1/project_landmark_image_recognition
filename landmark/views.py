@@ -21,8 +21,11 @@ LOCATION_DIR = os.path.join(BASE_DIR, 'location_data')
 # 이미지 분석 모델 로드
 model = tf.keras.models.load_model(MODEL_DIR)
 
+model.summary()
+
 landmark_data = pd.read_csv(os.path.join(LOCATION_DIR, 'landmark_list.csv'))
 labels = landmark_data['이름']
+
 
 # Create your views here.
 
@@ -37,7 +40,7 @@ def result(request):
         uploaded_img.save()  # DBMS에 저장 실행, INSERT SQL 실행
 
         recognition_label = recognition(img)
-        uploaded_img.delete() # 인식 완료된 이미지는 삭제
+        uploaded_img.delete()  # 인식 완료된 이미지는 삭제
 
         return analysis(recognition_label, request)
         # return analysis_new(uploaded_img.name,request)
@@ -83,9 +86,6 @@ def analysis(recognition_label, request):
     return render(request, 'result.html', {'result': result})
 
 
-
-
-
 def recommand(request):
     if request.method == 'GET':
         recommand_site = request.GET['recommand_site']
@@ -126,8 +126,8 @@ def recommand(request):
                 lng = row['경도']
 
                 start = (float(recommand_lat), float(recommand_lng))
-                goal = (float(lat),float(lng))
-                dist = round(haversine(start, goal),4)
+                goal = (float(lat), float(lng))
+                dist = round(haversine(start, goal), 4)
 
                 if dist > 1.5:
                     continue
@@ -172,4 +172,3 @@ def recommand(request):
 
 def recommand_new(request):
     dist_filter = request.POST['dist_filter']
-
