@@ -11,10 +11,10 @@ driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.get("https://www.google.co.kr/imghp?hl=ko&tab=wi&authuser=0&ogbl")
 
 BASE_DIR = Path(__file__).resolve().parent
-landmark_list_dir = "./crawling_target/landmark_img_target/"
-landmark_list_filename = "landmark_list.txt"
+landmark_list_dir = Path(BASE_DIR,"./crawling_target/landmark_img_target/")
+landmark_list_filename = "landmark_list_v2.txt"
 
-landmark_list_fullpath = Path(BASE_DIR, landmark_list_dir, landmark_list_filename)
+landmark_list_fullpath = Path(landmark_list_dir, landmark_list_filename)
 
 with open(landmark_list_fullpath, 'r', encoding='UTF-8') as f:
     for line in tqdm(f.readlines()):
@@ -28,6 +28,8 @@ with open(landmark_list_fullpath, 'r', encoding='UTF-8') as f:
         elem.send_keys(Keys.RETURN)
 
         try:
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+            driver.implicitly_wait(10)
             driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
             driver.implicitly_wait(10)
             images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")

@@ -318,4 +318,3 @@ def restaurant_processing():
     print(out_df)
 
 
-restaurant_processing()
