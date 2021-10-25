@@ -8,6 +8,7 @@ import os, json
 from pathlib import Path
 import pandas as pd
 import json
+import numpy as np
 
 import cv2
 
@@ -124,7 +125,7 @@ def csv_geocoder(filedir, filename):
     lng_arr = []
     for line in df.iloc:
         print(line['주소'])
-        lat, lng = geocoding_naver(line['주소'])
+        lat, lng = geocoding_naver(line['주소'].replace('\'',''))
         lat_arr.append(lat)
         lng_arr.append(lng)
 
@@ -137,6 +138,7 @@ def csv_geocoder(filedir, filename):
 def csv_to_initial_data_json(filedir, filename, model_name):
     df = pd.read_csv(os.path.join(filedir, filename))
     print(os.path.join(filedir, filename))
+    df = df.dropna()
 
     list = []
     data = {}
@@ -145,8 +147,11 @@ def csv_to_initial_data_json(filedir, filename, model_name):
     for line in df.iloc:
         fields['address'] = line['주소']
         fields['name'] = line['이름']
-        fields['lat'] = line['위도']
-        fields['lng'] = line['경도']
+        if line['위도'] is not np.nan:
+            fields['lat'] = line['위도']
+            fields['lng'] = line['경도']
+        else:
+            pass
         if '설명' in line.keys():
             fields['explain'] = line['설명']
         elif '세부분류' in line.keys():
@@ -168,7 +173,7 @@ def csv_to_initial_data_json(filedir, filename, model_name):
         f.writelines(jsonString)
 
 
-# csv_geocoder(os.path.join(BASE_DIR,'crawling_target','landmark_img_target'),'landmark_list_v3.csv')
+# csv_geocoder(os.path.join(BASE_DIR,'tour_site_data_processed'),'seoul_hotel_processed.csv')
 
-csv_to_initial_data_json(os.path.join(BASE_DIR, 'tour_site_data_processed'), 'seoul_hotel_processed.csv',
-                         'landmark.HotelSiteModel')
+csv_to_initial_data_json(os.path.join(BASE_DIR, 'tour_site_data_processed'), 'seoul_restaurant_processed.csv',
+                         'landmark.RestaurantSiteModel')
