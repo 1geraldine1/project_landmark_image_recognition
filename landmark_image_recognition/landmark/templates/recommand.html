@@ -1,0 +1,141 @@
+{% extends 'index.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% block content %}
+
+{{result | json_script:"jsonData"}}
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?key={{result.api_key}}" ></script>
+<style>
+.map {width:100%; height:300px; clear:both; border:solid 1px red; display:hidden;}
+.map_cover {display:none;}
+article div{overflow:visible}
+</style>
+<script type="text/javascript">
+    $('#imageSelect').attr('style', 'display:none;');
+
+    var data = JSON.parse(document.getElementById("jsonData").textContent)
+    var dist_filter = 0
+
+    var maps = [];
+    var markers = [];
+
+    function mapON(site) {
+
+        $('#map_cover_'+site).attr('style', 'display:inline');
+        $('#btn_'+site).attr('style','display:none')
+        $('#btn2_'+site).attr('style','display:inline-block')
+    }
+
+    function mapOFF(site) {
+        $('#map_cover_'+site).attr('style', 'display:none;');
+        $('#btn_'+site).attr('style','display:inline-block')
+        $('#btn2_'+site).attr('style','display:none')
+    }
+
+
+    function create_list(dfilter) {
+
+        object = document.getElementById('list-group')
+        txt = "";
+
+        for (site in data['recommand_list']){
+            name = data['recommand_list'][site]['name'];
+            address = data['recommand_list'][site]['address'];
+            lat = data['recommand_list'][site]['lat'];
+            lng = data['recommand_list'][site]['lng'];
+            category = data['recommand_list'][site]['category'];
+            dist = data['recommand_list'][site]['dist'];
+            filter = data['recommand_list'][site]['dist_filter'];
+
+            if (dfilter < filter) {continue}
+
+            txt += "<li class=\"list-group-item\">"
+            txt += "<table style=\"width: 90%; margin:auto;\"><tr>"
+            txt += "<td style=\"width:20%;\">이름 : " + name + "</td>"
+
+            if (category){txt += "<td style=\"width:15%;\">분류 : " + category + "</td>"}
+
+            txt += "<td style=\"width:40%\">주소 : " + address + "</td>"
+            txt += "<td style=\"width:10%;\">"
+            txt += "<button id=\"btn_" + site +"\" onclick=\"mapON(\'" + site + "\')\">위치 보기</button>"
+            txt += "<button id=\"btn2_" + site +"\" onclick=\"mapOFF(\'" + site + "\')\" style=\"display:none\">지도 접기</button>"
+            txt += "</td>"
+            txt += "</tr></table>"
+            txt += "<div class=\"map_cover\" id=\"map_cover_" + site +"\">"
+            txt += "<div class=\"map\" id=\"map_" + site + "\" lat=\"" + lat+ "\" lng=\"" + lng + "\" title=\"" + name + "\" site=\"" + site + "\"></div>"
+            txt += "</div>"
+            txt += "</li>"
+            console.log("txt : " + txt)
+        }
+        console.log("txt : " + txt)
+        object.innerHTML = txt
+
+
+        var $maps = $('.map');
+
+        $.each($maps, function (i, value) {
+            console.log("lat: "+$(value).attr('lat'));
+            var latlng = { lat: parseFloat($(value).attr('lat')), lng: parseFloat($(value).attr('lng')) };
+            console.log(latlng)
+            var mapDivId = $(value).attr('id');
+            var zoomLevel = 16;
+            var markerTitle = $(value).attr('title');
+            var markerMaxWidth = 300;
+            var site = $(value).attr('site')
+<!--            var contentString = '<div>' + data['recommand_site'][31]['explain'] + '</div>';-->
+            var contentString = '<div>' + '설명 데이터 추가 예정' + '</div>'
+
+            var mapOptions = {
+                        zoom: zoomLevel,
+                        center: latlng,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                     }
+
+            maps[mapDivId] = new google.maps.Map(document.getElementById(mapDivId), mapOptions);
+
+            markers[mapDivId] = new google.maps.Marker({
+                position: latlng,
+                map: maps[mapDivId]
+            });
+
+            var infowindow = new google.maps.InfoWindow(
+                                                {
+                                                    content: contentString,
+                                                    maxWidth: markerMaxWidth
+                                                }
+                                                );
+            google.maps.event.addListener(markers[mapDivId], 'click', function() {
+                infowindow.open(maps[mapDivId], markers[mapDivId]);
+            });
+        })
+
+    }
+
+</script>
+
+<div style="text-align:left">
+    <div class="dropdown">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+        거리별 필터
+      </a>
+
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li><a class="dropdown-item" href="#" onclick="create_list(0)">0.5km</a></li>
+        <li><a class="dropdown-item" href="#" onclick="create_list(1)">1km</a></li>
+        <li><a class="dropdown-item" href="#" onclick="create_list(2)">1.5km</a></li>
+      </ul>
+    </div>
+</div>
+
+<div class="content">
+    <div class="toDoDiv">
+        <ul class="list-group" id="list-group">
+
+        </ul>
+    </div>
+</div>
+
+
+
+{% endblock %}
