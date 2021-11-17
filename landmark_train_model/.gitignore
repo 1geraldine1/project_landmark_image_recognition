@@ -1,0 +1,11 @@
+venv/
+landmark/
+landmark_json/
+trained_model/
+Test/
+cropped_landmark/
+image_collected/
+./img_data_crop.npy
+./img_data_crop.npz
+./img_data_crop2.npz
+./img_data_noncrop.npz
