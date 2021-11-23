@@ -27,6 +27,22 @@
 * [서울시 문화시설 현황(한국어)](http://data.seoul.go.kr/dataList/OA-12993/S/1/datasetView.do)
 
 * [AI-Hub 한국형 사물 이미지](https://aihub.or.kr/aidata/132)
+
+
+# Development Environment
+
+이번 프로젝트는 다음과 같은 환경에서 개발되었습니다.
+
+## Hardware 
+
+* OS : Windows 10
+* CPU : AMD Ryzen 7 2700X
+* RAM : 16GB
+
+## Software
+
+* Language : Python 3.7, HTML5
+
     
 
 
