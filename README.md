@@ -25,6 +25,8 @@
 * [서울특별시 대규모점포 인허가 정보](http://data.seoul.go.kr/dataList/OA-16096/S/1/datasetView.do)
    
 * [서울시 문화시설 현황(한국어)](http://data.seoul.go.kr/dataList/OA-12993/S/1/datasetView.do)
+
+* [AI-Hub 한국형 사물 이미지](https://aihub.or.kr/aidata/132)
     
 
 
