@@ -39,9 +39,8 @@
 * CPU : AMD Ryzen 7 2700X
 * RAM : 16GB
 
-## Software
 
-* Language : Python 3.7, HTML5
+
 
     
 
