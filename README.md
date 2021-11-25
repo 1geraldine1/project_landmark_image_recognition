@@ -39,7 +39,12 @@
 * CPU : AMD Ryzen 7 2700X
 * RAM : 16GB
 
+## Software
 
+* Used-Framework : Django 3.2.6 (landmark_image_recognition)
+* Used-Library : Tensorflow 2.6.0
+* Used-Language : Python 3.7 , HTML5
+* DevTool : Pycharm, Visual Studio Code
 
 
     
