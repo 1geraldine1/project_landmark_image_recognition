@@ -41,7 +41,12 @@ landmark_image_recognition은 해당 폴더를 사용하는것을 전제로 제�
 
 # Files
 
-각 파일들의 역할은 다음과 같습니다.
+* Image_model_train.py : 현재 프로젝트에서 사용되는 이미지 인식 모델의 훈련 코드가 포함되어 있습니다. 
+  * model_cnn함수는 간단한 CNN모델을 구성하여 빠르고 쉽게 이미지 인식 모델을 제작할수 있습니다.
+  * model_efficientnet함수는 efficientnetB7모델을 전이학습하는 방식으로 이미지 인식 모델의 훈련을 진행합니다. 이 함수를 사용하는것을 권장합니다.
+* Image_to_Dataset.py
+  * create_dataset_noncrop_np함수는 지정한 디렉터리의 이미지를 모아 npz형태의 데이터셋으로 변환합니다.
+  * create_image_data_crop함수는 [AI-HUB의 한국형 사물 이미지](https://aihub.or.kr/aidata/132) 데이터중 랜드마크 이미지를 사용할때 랜드마크 이미지의 영역을 표시해주는 json파일을 통해 랜드마크 이미지의 crop을 진행하여 저장해줍니다. 이 작업을 통해 이미지 인식 모델의 정확성을 높일수 있지만, 영역을 표시한 json파일이 별도로 필요합니다.
 
 
 
