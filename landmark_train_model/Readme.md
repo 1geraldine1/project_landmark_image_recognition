@@ -4,6 +4,7 @@ landmark_image_crawler를 통해 수집한 랜드마크 이미지를 기반으�
 
 # data-architecture
 
+landmark_image_crawler 이외의 방법으로 랜드마크의 이미지를 수집하였을때 image_model_train.py 코드를 사용하기 위한 데이터 구조도입니다.
 image_model_train.py 을 통해 훈련시킬 이미지들은 하나의 폴더 내부에 클래스 단위로 구분되어진 폴더, 해당 폴더 내부에 각 클래스의 이미지를 저장하는 방식으로 구성되어야 합니다.
 
 ***
