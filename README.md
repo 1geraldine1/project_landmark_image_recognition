@@ -49,7 +49,7 @@
 # Demonstration Video
 
 이미지 클릭시 시연 영상이 실행됩니다.
-<>
+<br><br>
 [![시연 영상](http://img.youtube.com/vi/98SOzJ3Fnz0/0.jpg)](https://www.youtube.com/embed//98SOzJ3Fnz0)
 
 
