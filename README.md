@@ -46,9 +46,17 @@
 * Used-Language : Python 3.7 , HTML5
 * DevTool : Pycharm, Visual Studio Code
 
+# Demonstration Video
 
-    
+<div>
+  <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed//98SOzJ3Fnz0' frameborder='0' allowfullscreen></iframe></div>
+</div>
 
+
+
+# Etc
+
+[제 블로그](https://1geraldine1.github.io/categories/#%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%A6%AC%EB%A9%94%EC%9D%B4%ED%81%AC)에서 이번 프로젝트의 개발 일지를 볼 수 있습니다.
 
 
 
